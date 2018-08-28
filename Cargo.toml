@@ -1,0 +1,7 @@
+[package]
+name = "EverybodyLovesRayTracer"
+version = "0.1.0"
+authors = ["jcmm <jcmmelton@gmail.com>"]
+
+[dependencies]
+image = "*"
