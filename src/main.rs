@@ -20,14 +20,26 @@ use camera::*;
 
 fn color(ray: Ray, world: &World) -> Vec3 {
     let mut hit_record: HitRecord = HitRecord::new();
-    if world.hit(&ray, 0.0, 255.0, &mut hit_record) {
-        return 0.5 * Vec3::new(hit_record.normal.x()+1.0, hit_record.normal.y()+1.0, hit_record.normal.z()+1.0);
+    if world.hit(&ray, 0.0001, 255.0, &mut hit_record) {
+        let target: Vec3 = hit_record.p + hit_record.normal + random_in_unit_sphere();
+        return 0.5*color(Ray::new(hit_record.p, target-hit_record.p), &world);
     }
     else {
         let unit_direction: Vec3 = Vec3::unit_vector(ray.direction());
         let t: f32 = 0.5 * (unit_direction.y() + 1.0);
         return (1.0-t)*Vec3::new(1.0, 1.0, 1.0) + t*Vec3::new(0.5, 0.7, 1.0);
     }
+}
+
+fn random_in_unit_sphere() -> Vec3 {
+    let mut p: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+    loop {
+        p = 2.0*Vec3::new(rand::random::<f32>(),rand::random::<f32>(),rand::random::<f32>()) - Vec3::new(1.0, 1.0, 1.0);
+        if p.squared_length() >= 1.0 {
+            break;
+        }
+    }
+    p
 }
 
 fn main() {
@@ -57,6 +69,7 @@ fn main() {
                 col += color(r, &world);
             }
             col /= fx;
+            col = Vec3::new(f32::sqrt(col.r()),f32::sqrt(col.g()),f32::sqrt(col.b()) );
             let r: u8 = (255.99 * col.r()) as u8;
             let g: u8 = (255.99 * col.g()) as u8;
             let b: u8 = (255.99 * col.b()) as u8;
