@@ -43,15 +43,15 @@ impl Vec3 {
     }
 
     pub fn r(&self) -> f32 {
-        self.e[0]
+        f32::abs(self.e[0])
     }
 
     pub fn g(&self) -> f32 {
-        self.e[1]
+        f32::abs(self.e[1])
     }
 
     pub fn b(&self) -> f32 {
-        self.e[2]
+        f32::abs(self.e[2])
     }
 
     pub fn x_u8(&self) -> u8 {

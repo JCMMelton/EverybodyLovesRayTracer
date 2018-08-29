@@ -1,33 +1,39 @@
 
 use vec3::*;
 use ray::*;
+use material::*;
 
 #[derive(Debug, Copy, Clone)]
 pub struct HitRecord {
     pub t: f32,
     pub p: Vec3,
-    pub normal: Vec3
+    pub normal: Vec3,
+    pub mat: Material
 }
 
 impl HitRecord {
-    pub fn new() -> Self {
+    pub fn new(mat: Material) -> Self {
         HitRecord{
             t: 0.0,
             p: Vec3::new(0.0, 0.0, 0.0),
-            normal: Vec3::new(0.0, 0.0, 0.0)
+            normal: Vec3::new(0.0, 0.0, 0.0),
+            mat
         }
     }
     pub fn from_hit_record(rec: &HitRecord) -> Self {
         HitRecord{
             t: rec.t,
             p: rec.p,
-            normal: rec.normal
+            normal: rec.normal,
+            mat: rec.mat
         }
     }
     pub fn copy_from_hit_record(&mut self, rec: &HitRecord) {
+
         self.t = rec.t;
         self.p = rec.p;
         self.normal = rec.normal;
+        self.mat = rec.mat;
     }
 }
 

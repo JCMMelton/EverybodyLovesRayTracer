@@ -3,7 +3,6 @@ extern crate rand;
 
 use image::{ImageBuffer, Pixel, Rgb};
 use std::f32;
-use rand::random;
 
 mod vec3;
 use vec3::*;
@@ -17,29 +16,30 @@ mod world;
 use world::*;
 mod camera;
 use camera::*;
+mod material;
+use material::*;
+mod utils;
 
-fn color(ray: Ray, world: &World) -> Vec3 {
-    let mut hit_record: HitRecord = HitRecord::new();
-    if world.hit(&ray, 0.0001, 255.0, &mut hit_record) {
-        let target: Vec3 = hit_record.p + hit_record.normal + random_in_unit_sphere();
-        return 0.5*color(Ray::new(hit_record.p, target-hit_record.p), &world);
+fn color(ray: Ray, world: &World, depth: i32) -> Vec3 {
+    let mut hit_record: HitRecord = HitRecord::new(
+        Material::new_blank()
+    );
+    if world.hit(&ray, 0.0001, f32::MAX, &mut hit_record) {
+        let mut scattered: Ray = Ray::new_empty();
+        let mut attenuation: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+        let scatter_result: (bool, Ray, Vec3) = hit_record.mat.scatter(&ray, &hit_record, &attenuation, &scattered);
+        if depth < 50 && scatter_result.0 {
+            return scatter_result.2*color(scatter_result.1, &world, depth+1);
+        }
+        else {
+            return Vec3::new(0.0, 0.0, 0.0);
+        }
     }
     else {
         let unit_direction: Vec3 = Vec3::unit_vector(ray.direction());
         let t: f32 = 0.5 * (unit_direction.y() + 1.0);
         return (1.0-t)*Vec3::new(1.0, 1.0, 1.0) + t*Vec3::new(0.5, 0.7, 1.0);
     }
-}
-
-fn random_in_unit_sphere() -> Vec3 {
-    let mut p: Vec3 = Vec3::new(0.0, 0.0, 0.0);
-    loop {
-        p = 2.0*Vec3::new(rand::random::<f32>(),rand::random::<f32>(),rand::random::<f32>()) - Vec3::new(1.0, 1.0, 1.0);
-        if p.squared_length() >= 1.0 {
-            break;
-        }
-    }
-    p
 }
 
 fn main() {
@@ -54,10 +54,35 @@ fn main() {
     let cam: Camera = Camera::new();
 
     let mut spheres: Vec<Sphere> = Vec::new();
-    spheres.push(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5));
-    spheres.push(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0));
+    spheres.push(
+        Sphere::new(
+            Vec3::new(0.0, 0.0, -1.0), 0.5,
+            Material::new(Vec3::new(0.8, 0.6, 0.2), MaterialComposition::Lambertian)
+        )
+    );
+    spheres.push(
+        Sphere::new(
+            Vec3::new(0.0, -100.5, -1.0),
+            100.0,
+             Material::new(Vec3::new(0.8, 0.8, 0.3), MaterialComposition::Lambertian)
+        )
+    );
+    spheres.push(
+        Sphere::new(
+            Vec3::new(1.0, 0.0, -1.0),
+            0.5,
+             Material::new(Vec3::new(0.8, 0.6, 0.2), MaterialComposition::Metal)
+        )
+    );
+    spheres.push(
+        Sphere::new(
+            Vec3::new(-1.0, 0.0, -1.0),
+            0.5,
+             Material::new(Vec3::new(0.8, 0.8, 0.8), MaterialComposition::Metal)
+        )
+    );
     let world: World = World::from_vec(spheres);
-
+    let depth: i32 = 0;
     for j in 0..ny {
         for i in 0..nx {
             let mut col: Vec3 = Vec3::new(0.0, 0.0, 0.0);
@@ -66,7 +91,7 @@ fn main() {
                 let v: f32 = (((ny-j) as f32)+rand::random::<f32>())/fy;
                 let r: Ray = cam.get_ray(u, v);
                 let p: Vec3 = r.point_at_parameter(2.0);
-                col += color(r, &world);
+                col += color(r, &world, depth);
             }
             col /= fx;
             col = Vec3::new(f32::sqrt(col.r()),f32::sqrt(col.g()),f32::sqrt(col.b()) );

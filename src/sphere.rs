@@ -2,17 +2,20 @@
 use vec3::*;
 use hit::*;
 use ray::*;
+use material::*;
 
 pub struct Sphere {
     pub radius: f32,
-    pub center: Vec3
+    pub center: Vec3,
+    pub mat: Material,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f32) -> Self {
+    pub fn new(center: Vec3, radius: f32, mat: Material) -> Self {
         Sphere {
             center,
-            radius
+            radius,
+            mat
         }
     }
 }
@@ -30,6 +33,7 @@ impl Hit for Sphere {
                 rec.t = temp;
                 rec.p = r.point_at_parameter(rec.t);
                 rec.normal = (rec.p - self.center) / self.radius;
+                rec.mat = self.mat;
                 return true;
             }
             temp = (-b + f32::sqrt(f32::powf(b, 2.0) - a*c))/a;
@@ -37,6 +41,7 @@ impl Hit for Sphere {
                 rec.t = temp;
                 rec.p = r.point_at_parameter(rec.t);
                 rec.normal = (rec.p - self.center) / self.radius;
+                rec.mat = self.mat;
                 return true;
             }
         }
