@@ -57,28 +57,55 @@ fn main() {
     spheres.push(
         Sphere::new(
             Vec3::new(0.0, 0.0, -1.0), 0.5,
-            Material::new(Vec3::new(0.8, 0.6, 0.2), MaterialComposition::Lambertian)
+            Material::new(
+                Vec3::new(0.8, 0.2, 0.1),
+                MaterialComposition::Lambertian,
+                1.9
+            )
         )
     );
     spheres.push(
         Sphere::new(
             Vec3::new(0.0, -100.5, -1.0),
             100.0,
-             Material::new(Vec3::new(0.8, 0.8, 0.3), MaterialComposition::Lambertian)
+             Material::new(
+                 Vec3::new(0.8, 0.8, 0.3),
+                 MaterialComposition::Lambertian,
+                 0.0
+             )
         )
     );
     spheres.push(
         Sphere::new(
-            Vec3::new(1.0, 0.0, -1.0),
+            Vec3::new(1.4, 0.2, -1.2),
             0.5,
-             Material::new(Vec3::new(0.8, 0.6, 0.2), MaterialComposition::Metal)
+             Material::new(
+                 Vec3::new(0.9, 0.9, 0.9),
+                 MaterialComposition::Metal,
+                 0.0
+             )
         )
     );
     spheres.push(
         Sphere::new(
-            Vec3::new(-1.0, 0.0, -1.0),
-            0.5,
-             Material::new(Vec3::new(0.8, 0.8, 0.8), MaterialComposition::Metal)
+            Vec3::new(-3.0, 2.0, -3.0),
+            1.75,
+             Material::new(
+                 Vec3::new(0.8, 0.8, 0.8),
+                 MaterialComposition::Metal,
+                 0.0
+             )
+        )
+    );
+    spheres.push(
+        Sphere::new(
+            Vec3::new(0.0, 2.0, 3.0),
+            1.75,
+             Material::new(
+                 Vec3::new(0.8, 0.8, 0.8),
+                 MaterialComposition::Lambertian,
+                 0.0
+             )
         )
     );
     let world: World = World::from_vec(spheres);

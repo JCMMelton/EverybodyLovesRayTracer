@@ -13,21 +13,24 @@ pub enum MaterialComposition {
 #[derive(Debug, Copy, Clone)]
 pub struct Material {
     pub albedo: Vec3,
-    pub composition: MaterialComposition
+    pub composition: MaterialComposition,
+    pub fuzz: f32
 }
 
 impl Material {
 
-    pub fn new(albedo: Vec3, composition: MaterialComposition) -> Self {
+    pub fn new(albedo: Vec3, composition: MaterialComposition, fuzz: f32) -> Self {
         Material {
             albedo,
-            composition
+            composition,
+            fuzz
         }
     }
     pub fn new_blank() -> Self {
         Material {
             albedo: Vec3::new(0.0, 0.0, 0.0),
-            composition: MaterialComposition::Lambertian
+            composition: MaterialComposition::Lambertian,
+            fuzz: 1.0
         }
     }
 
@@ -47,7 +50,7 @@ impl Material {
 
     pub fn scatter_metal(&self, r_in: &Ray, hit_record: &HitRecord, attenuation: &Vec3, scattered: &Ray) -> (bool, Ray, Vec3) {
         let reflected: Vec3 = Utils::reflect(&Vec3::unit_vector(r_in.direction()), &hit_record.normal);
-        let scatter: Ray = Ray::new(hit_record.p, reflected);
+        let scatter: Ray = Ray::new(hit_record.p, reflected + self.fuzz*Utils::random_in_unit_sphere());
         let atten: Vec3  = self.albedo;
         (Vec3::dot(&scatter.direction(), &hit_record.normal) > 0.0, scatter, atten)
     }
