@@ -1,7 +1,7 @@
 use std::ops::{Neg, Div, DivAssign, Sub, SubAssign, Add, AddAssign, Mul, MulAssign};
 use std::f32;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Vec3 {
     e: [f32; 3]
 }
