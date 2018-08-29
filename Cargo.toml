@@ -1,7 +1,8 @@
 [package]
-name = "EverybodyLovesRayTracer"
+name = "everybody_loves_ray_tracer"
 version = "0.1.0"
 authors = ["jcmm <jcmmelton@gmail.com>"]
 
 [dependencies]
 image = "*"
+rand  = "*"
