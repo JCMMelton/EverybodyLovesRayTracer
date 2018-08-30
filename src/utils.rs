@@ -6,6 +6,7 @@ use vec3::*;
 pub struct Utils {}
 
 impl Utils {
+
     pub fn random_in_unit_sphere() -> Vec3 {
         let mut p: Vec3 = Vec3::new(0.0, 0.0, 0.0);
         loop {
@@ -20,7 +21,25 @@ impl Utils {
         }
         p
     }
+
+    pub fn schlick(cosine: f32, ref_idx: f32) -> f32 {
+        let mut r0: f32 = (1.0-ref_idx) / (1.0+ref_idx);
+        f32::powf(r0, 2.0) + (1.0-r0) * f32::powf(1.0-cosine, 5.0)
+    }
+
+    pub fn refract(v: &Vec3, n: &Vec3, ni_over_nt: f32, refracted: &mut Vec3) -> bool {
+        let uv: Vec3 = Vec3::unit_vector(v.copy());
+        let dt: f32 = Vec3::dot(&uv, n);
+        let discriminant: f32 = 1.0 - f32::powf(ni_over_nt, 2.0)*(1.0-f32::powf(dt, 2.0));
+        if discriminant > 0.0 {
+            *refracted = ni_over_nt * (uv.copy() - n.copy()*dt) - n.copy()*f32::sqrt(discriminant);
+            return true;
+        }
+        false
+    }
+
     pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
         v.copy() - 2.0*Vec3::dot(v, n)*n.copy()
     }
+
 }

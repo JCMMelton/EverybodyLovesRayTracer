@@ -42,10 +42,29 @@ fn color(ray: Ray, world: &World, depth: i32) -> Vec3 {
     }
 }
 
+fn sphere_swoop(n: u32) -> Vec<Sphere> {
+    let mut spheres: Vec<Sphere> = Vec::new();
+    for s in 0..n {
+        let sf: f32 = s as f32;
+        spheres.push(
+            Sphere::new(
+                Vec3::new(0.0+f32::sin(sf), 0.0+f32::cos(sf), -1.0-(sf*0.5)), 0.5+(sf*0.1),
+                Material::new(
+                    Vec3::new(0.9, 0.9, 0.9),
+                    MaterialComposition::Metal,
+                    0.1,
+                    0.0
+                )
+            )
+        );
+    }
+    spheres
+}
+
 fn main() {
     let nx: u32 = 200;
-    let ny: u32 = 100;
-    let ns: u32 = 100;
+    let ny: u32 = nx/2;
+    let ns: u32 = nx/2;
     let fx: f32 = nx as f32;
     let fy: f32 = ny as f32;
     let fs: f32 = ns as f32;
@@ -53,14 +72,15 @@ fn main() {
 
     let cam: Camera = Camera::new();
 
-    let mut spheres: Vec<Sphere> = Vec::new();
+    let mut spheres: Vec<Sphere> = Vec::new();//sphere_swoop(20);
     spheres.push(
         Sphere::new(
             Vec3::new(0.0, 0.0, -1.0), 0.5,
             Material::new(
-                Vec3::new(0.8, 0.2, 0.1),
-                MaterialComposition::Lambertian,
-                1.9
+                Vec3::new(0.9, 0.9, 0.9),
+                MaterialComposition::Dialectric,
+                0.2,
+                0.9
             )
         )
     );
@@ -71,6 +91,7 @@ fn main() {
              Material::new(
                  Vec3::new(0.8, 0.8, 0.3),
                  MaterialComposition::Lambertian,
+                 0.0,
                  0.0
              )
         )
@@ -82,6 +103,7 @@ fn main() {
              Material::new(
                  Vec3::new(0.9, 0.9, 0.9),
                  MaterialComposition::Metal,
+                 0.0,
                  0.0
              )
         )
@@ -93,6 +115,7 @@ fn main() {
              Material::new(
                  Vec3::new(0.8, 0.8, 0.8),
                  MaterialComposition::Metal,
+                 0.0,
                  0.0
              )
         )
@@ -104,6 +127,7 @@ fn main() {
              Material::new(
                  Vec3::new(0.8, 0.8, 0.8),
                  MaterialComposition::Lambertian,
+                 0.0,
                  0.0
              )
         )
