@@ -62,7 +62,7 @@ fn sphere_swoop(n: u32) -> Vec<Sphere> {
 }
 
 fn main() {
-    let nx: u32 = 200;
+    let nx: u32 = 600;
     let ny: u32 = nx/2;
     let ns: u32 = nx/2;
     let fx: f32 = nx as f32;
@@ -70,7 +70,13 @@ fn main() {
     let fs: f32 = ns as f32;
     let mut img = ImageBuffer::new(nx, ny);
 
-    let cam: Camera = Camera::new();
+    let cam: Camera = Camera::new(
+        Vec3::new(-2.0, 2.0, 1.0),
+        Vec3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        90.0,
+        fx/fy
+    );
 
     let mut spheres: Vec<Sphere> = Vec::new();//sphere_swoop(20);
     spheres.push(
@@ -110,7 +116,7 @@ fn main() {
     );
     spheres.push(
         Sphere::new(
-            Vec3::new(-3.0, 2.0, -3.0),
+            Vec3::new(-2.0, 3.0, -3.0),
             1.75,
              Material::new(
                  Vec3::new(0.8, 0.8, 0.8),
