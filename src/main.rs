@@ -62,7 +62,7 @@ fn sphere_swoop(n: u32) -> Vec<Sphere> {
 }
 
 fn main() {
-    let nx: u32 = 600;
+    let nx: u32 = 400;
     let ny: u32 = nx/2;
     let ns: u32 = nx/2;
     let fx: f32 = nx as f32;
@@ -70,12 +70,19 @@ fn main() {
     let fs: f32 = ns as f32;
     let mut img = ImageBuffer::new(nx, ny);
 
+    let lookfrom: Vec3 = Vec3::new(-2.0, 2.0, 1.0);
+    let lookat:   Vec3 = Vec3::new(0.0, 0.0, -1.0);
+    let dist_to_focus: f32 = (lookfrom-lookat).length();
+    let aperture: f32 = 2.0;
+
     let cam: Camera = Camera::new(
-        Vec3::new(-2.0, 2.0, 1.0),
-        Vec3::new(0.0, 0.0, -1.0),
+        lookfrom,
+        lookat,
         Vec3::new(0.0, 1.0, 0.0),
         90.0,
-        fx/fy
+        fx/fy,
+        aperture,
+        dist_to_focus
     );
 
     let mut spheres: Vec<Sphere> = Vec::new();//sphere_swoop(20);
