@@ -3,6 +3,8 @@ use hit::*;
 use ray::*;
 use sphere::*;
 use material::*;
+use bounding_box::*;
+use vec3::*;
 
 pub struct World {
     pub contents: Vec<Sphere>
@@ -34,5 +36,15 @@ impl Hit for World {
             }
         }
         hit_anything
+    }
+    fn bounding_box(&self, t0: f32, t1: f32) -> AABB {
+        let mut temp_box: AABB = AABB::new(&Vec3::from_value(0.0), &Vec3::from_value(0.0));
+        if self.contents.len() < 1 {
+            return temp_box;
+        }
+        for object in self.contents.iter() {
+            temp_box = AABB::surrounding_box(object.bounding_box(t0, t1), temp_box);
+        }
+        temp_box
     }
 }

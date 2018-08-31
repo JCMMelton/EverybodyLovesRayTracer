@@ -18,8 +18,8 @@ impl Ray {
 
     pub fn new_empty() -> Self {
         Ray {
-            a: Vec3::new(0.0, 0.0, 0.0),
-            b: Vec3::new(0.0, 0.0, 0.0)
+            a: Vec3::from_value(0.0),
+            b: Vec3::from_value(0.0)
         }
     }
 

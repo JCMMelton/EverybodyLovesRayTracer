@@ -19,26 +19,27 @@ use camera::*;
 mod material;
 use material::*;
 mod utils;
+mod bounding_box;
 
 fn color(ray: Ray, world: &World, depth: i32) -> Vec3 {
     let mut hit_record: HitRecord = HitRecord::new(
         Material::new_blank()
     );
     if world.hit(&ray, 0.0001, f32::MAX, &mut hit_record) {
-        let mut scattered: Ray = Ray::new_empty();
-        let mut attenuation: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+        let scattered: Ray = Ray::new_empty();
+        let attenuation: Vec3 = Vec3::from_value(0.0);
         let scatter_result: (bool, Ray, Vec3) = hit_record.mat.scatter(&ray, &hit_record, &attenuation, &scattered);
         if depth < 50 && scatter_result.0 {
             return scatter_result.2*color(scatter_result.1, &world, depth+1);
         }
         else {
-            return Vec3::new(0.0, 0.0, 0.0);
+            return Vec3::from_value(0.0);
         }
     }
     else {
         let unit_direction: Vec3 = Vec3::unit_vector(ray.direction());
         let t: f32 = 0.5 * (unit_direction.y() + 1.0);
-        return (1.0-t)*Vec3::new(1.0, 1.0, 1.0) + t*Vec3::new(0.5, 0.7, 1.0);
+        return (1.0-t)*Vec3::from_value(1.0) + t*Vec3::new(0.5, 0.7, 1.0);
     }
 }
 
@@ -67,13 +68,12 @@ fn main() {
     let ns: u32 = nx/2;
     let fx: f32 = nx as f32;
     let fy: f32 = ny as f32;
-    let fs: f32 = ns as f32;
     let mut img = ImageBuffer::new(nx, ny);
 
-    let lookfrom: Vec3 = Vec3::new(-2.0, 2.0, 1.0);
+    let lookfrom: Vec3 = Vec3::new(-1.0, 1.0, 1.0);
     let lookat:   Vec3 = Vec3::new(0.0, 0.0, -1.0);
     let dist_to_focus: f32 = (lookfrom-lookat).length();
-    let aperture: f32 = 2.0;
+    let aperture: f32 = 1.2;
 
     let cam: Camera = Camera::new(
         lookfrom,
@@ -149,16 +149,16 @@ fn main() {
     let depth: i32 = 0;
     for j in 0..ny {
         for i in 0..nx {
-            let mut col: Vec3 = Vec3::new(0.0, 0.0, 0.0);
-            for s in 0..ns {
+            let mut col: Vec3 = Vec3::from_value(0.0);
+            for _ in 0..ns {
                 let u: f32 = ((i as f32)+rand::random::<f32>())/fx;
                 let v: f32 = (((ny-j) as f32)+rand::random::<f32>())/fy;
                 let r: Ray = cam.get_ray(u, v);
-                let p: Vec3 = r.point_at_parameter(2.0);
+                let _p: Vec3 = r.point_at_parameter(2.0);
                 col += color(r, &world, depth);
             }
             col /= fx;
-            col = Vec3::new(f32::sqrt(col.r()),f32::sqrt(col.g()),f32::sqrt(col.b()) );
+            col = Vec3::new(f32::sqrt(col.r()), f32::sqrt(col.g()), f32::sqrt(col.b()) );
             let r: u8 = (255.99 * col.r()) as u8;
             let g: u8 = (255.99 * col.g()) as u8;
             let b: u8 = (255.99 * col.b()) as u8;

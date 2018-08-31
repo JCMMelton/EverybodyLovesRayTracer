@@ -34,7 +34,7 @@ impl Material {
     }
     pub fn new_blank() -> Self {
         Material {
-            albedo: Vec3::new(0.0, 0.0, 0.0),
+            albedo: Vec3::from_value(0.0),
             composition: MaterialComposition::Lambertian,
             fuzz: 1.0,
             ref_idx: 0.0
@@ -64,14 +64,14 @@ impl Material {
     }
 
     pub fn scatter_dialectric(&self, r_in: &Ray, hit_record: &HitRecord, attenuation: &Vec3, scattered: &Ray) -> (bool, Ray, Vec3) {
-        let mut outward_normal: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+        let outward_normal: Vec3;
         let reflected: Vec3 = Utils::reflect(&r_in.direction(), &hit_record.normal);
-        let mut refracted: Vec3 = Vec3::new(0.0, 0.0, 0.0);
-        let mut ni_over_nt: f32 = 0.0;
-        let atten: Vec3  = Vec3::new(1.0, 1.0, 1.0);
-        let mut reflect_prob: f32 = 0.0;
-        let mut cosine: f32 = 0.0;
-        let mut scatter: Ray = Ray::new_empty();
+        let mut refracted: Vec3 = Vec3::from_value(0.0);
+        let ni_over_nt: f32;
+        let atten: Vec3  = Vec3::from_value(1.0);
+        let reflect_prob: f32;
+        let cosine: f32;
+        let mut scatter: Ray;
 
         if Vec3::dot(&r_in.direction(), &hit_record.normal) > 0.0 {
             outward_normal = -hit_record.normal;

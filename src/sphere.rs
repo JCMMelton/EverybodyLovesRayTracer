@@ -3,6 +3,7 @@ use vec3::*;
 use hit::*;
 use ray::*;
 use material::*;
+use bounding_box::*;
 
 pub struct Sphere {
     pub radius: f32,
@@ -46,5 +47,8 @@ impl Hit for Sphere {
             }
         }
         false
+    }
+    fn bounding_box(&self, t0: f32, t1: f32) -> AABB {
+        AABB::new(&(self.center.copy() - Vec3::from_value(self.radius)), &(self.center.copy() - Vec3::from_value(self.radius)))  
     }
 }

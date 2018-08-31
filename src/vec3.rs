@@ -1,4 +1,4 @@
-use std::ops::{Neg, Div, DivAssign, Sub, SubAssign, Add, AddAssign, Mul, MulAssign};
+use std::ops::{Neg, Div, DivAssign, Sub, SubAssign, Add, AddAssign, Mul, MulAssign, Index};
 use std::f32;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -27,6 +27,12 @@ impl Vec3 {
                 v.e[1],
                 v.e[2]
             ]
+        }
+    }
+
+    pub fn from_value(v: f32) -> Self {
+        Vec3 {
+            e: [v, v, v]
         }
     }
 
@@ -295,6 +301,13 @@ impl MulAssign<f32> for Vec3 {
         self.e[0] *= other;
         self.e[1] *= other;
         self.e[2] *= other;
+    }
+}
+
+impl Index<usize> for Vec3 {
+    type Output = f32;
+    fn index(&self, index: usize) -> &f32 {
+        &self.e[index]
     }
 }
 

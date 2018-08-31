@@ -8,7 +8,7 @@ pub struct Utils {}
 impl Utils {
 
     pub fn random_in_unit_disk() -> Vec3 {
-        let mut p: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+        let mut p: Vec3;
         loop {
                 p = 2.0*Vec3::new(
                     rand::random::<f32>(),
@@ -23,7 +23,7 @@ impl Utils {
     }
 
     pub fn random_in_unit_sphere() -> Vec3 {
-        let mut p: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+        let mut p: Vec3;
         loop {
             p = 2.0*Vec3::new(
                 rand::random::<f32>(),
@@ -38,7 +38,7 @@ impl Utils {
     }
 
     pub fn schlick(cosine: f32, ref_idx: f32) -> f32 {
-        let mut r0: f32 = (1.0-ref_idx) / (1.0+ref_idx);
+        let r0: f32 = (1.0-ref_idx) / (1.0+ref_idx);
         f32::powf(r0, 2.0) + (1.0-r0) * f32::powf(1.0-cosine, 5.0)
     }
 
