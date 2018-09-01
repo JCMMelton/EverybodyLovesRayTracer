@@ -1,8 +1,11 @@
 extern crate image;
 extern crate rand;
+extern crate rayon;
 
+use rayon::prelude::*;
 use image::{ImageBuffer, Pixel, Rgb};
 use std::f32;
+use std::sync::{Mutex, Arc};
 
 mod vec3;
 use vec3::*;
@@ -20,17 +23,20 @@ mod material;
 use material::*;
 mod utils;
 mod bounding_box;
+mod rectangle;
+use rectangle::*;
 
 fn color(ray: Ray, world: &World, depth: i32) -> Vec3 {
-    let mut hit_record: HitRecord = HitRecord::new(
+    let hit_record: HitRecord = HitRecord::new(
         Material::new_blank()
     );
-    if world.hit(&ray, 0.0001, f32::MAX, &mut hit_record) {
+    let world_hit = world.hit(&ray, 0.0001, f32::MAX, &hit_record);
+    if world_hit.0 {
         let scattered: Ray = Ray::new_empty();
         let attenuation: Vec3 = Vec3::from_value(0.0);
-        let scatter_result: (bool, Ray, Vec3) = hit_record.mat.scatter(&ray, &hit_record, &attenuation, &scattered);
+        let scatter_result: (bool, Ray, Vec3) = (world_hit.1).mat.scatter(&ray, &world_hit.1, &attenuation, &scattered);
         if depth < 50 && scatter_result.0 {
-            return scatter_result.2*color(scatter_result.1, &world, depth+1);
+            return scatter_result.2 * color(scatter_result.1, &world, depth+1);
         }
         else {
             return Vec3::from_value(0.0);
@@ -84,75 +90,89 @@ fn main() {
         aperture,
         dist_to_focus
     );
-
-    let mut spheres: Vec<Sphere> = Vec::new();//sphere_swoop(20);
-    spheres.push(
-        Sphere::new(
-            Vec3::new(0.0, 0.0, -1.0), 0.5,
-            Material::new(
-                Vec3::new(0.9, 0.9, 0.9),
-                MaterialComposition::Dialectric,
-                0.2,
-                0.9
+    let world: World = World::from_vec(
+        vec![
+            // Box::new(
+            //     Sphere::new(
+            //         Vec3::new(0.0, 0.0, -1.0), 0.5,
+            //         Material::new(
+            //             Vec3::new(0.9, 0.9, 0.9),
+            //             MaterialComposition::Dialectric,
+            //             0.2,
+            //             0.9
+            //         )
+            //     )
+            // ),
+            Box::new(
+                Sphere::new(
+                    Vec3::new(0.0, -100.5, -1.0),
+                    100.0,
+                     Material::new(
+                         Vec3::new(0.8, 0.8, 0.3),
+                         MaterialComposition::Lambertian,
+                         0.0,
+                         0.0
+                     )
+                )
+            ),
+            // Box::new(
+            //     Sphere::new(
+            //         Vec3::new(1.4, 0.2, -1.2),
+            //         0.5,
+            //          Material::new(
+            //              Vec3::new(0.9, 0.9, 0.9),
+            //              MaterialComposition::Metal,
+            //              0.0,
+            //              0.0
+            //          )
+            //     )
+            // ),
+            // Box::new(
+            //     Sphere::new(
+            //         Vec3::new(-2.0, 3.0, -3.0),
+            //         1.75,
+            //         Material::new(
+            //             Vec3::new(0.8, 0.8, 0.8),
+            //             MaterialComposition::Metal,
+            //             0.0,
+            //             0.0
+            //         )
+            //     )
+            // ),
+            // Box::new(
+            //     Sphere::new(
+            //         Vec3::new(0.0, 2.0, 3.0),
+            //         1.75,
+            //         Material::new(
+            //          Vec3::new(0.8, 0.8, 0.8),
+            //          MaterialComposition::Lambertian,
+            //          0.0,
+            //          0.0
+            //         )
+            //     )
+            // ),
+            Box::new(
+                Rectangle::new(
+                    [0.0, 10.0, -10.0, 0.0],
+                    -1.0,
+                    Material::new(
+                        Vec3::new(0.8, 0.8, 0.8),
+                        MaterialComposition::Lambertian,
+                        0.0,
+                        0.0
+                    )
+                )    
             )
-        )
+        ]
     );
-    spheres.push(
-        Sphere::new(
-            Vec3::new(0.0, -100.5, -1.0),
-            100.0,
-             Material::new(
-                 Vec3::new(0.8, 0.8, 0.3),
-                 MaterialComposition::Lambertian,
-                 0.0,
-                 0.0
-             )
-        )
-    );
-    spheres.push(
-        Sphere::new(
-            Vec3::new(1.4, 0.2, -1.2),
-            0.5,
-             Material::new(
-                 Vec3::new(0.9, 0.9, 0.9),
-                 MaterialComposition::Metal,
-                 0.0,
-                 0.0
-             )
-        )
-    );
-    spheres.push(
-        Sphere::new(
-            Vec3::new(-2.0, 3.0, -3.0),
-            1.75,
-             Material::new(
-                 Vec3::new(0.8, 0.8, 0.8),
-                 MaterialComposition::Metal,
-                 0.0,
-                 0.0
-             )
-        )
-    );
-    spheres.push(
-        Sphere::new(
-            Vec3::new(0.0, 2.0, 3.0),
-            1.75,
-             Material::new(
-                 Vec3::new(0.8, 0.8, 0.8),
-                 MaterialComposition::Lambertian,
-                 0.0,
-                 0.0
-             )
-        )
-    );
-    let world: World = World::from_vec(spheres);
     let depth: i32 = 0;
-    for j in 0..ny {
-        for i in 0..nx {
+    let safe_img = Arc::new(Mutex::new(img));
+    (0..ny).into_par_iter().for_each(|j| {
+        (0..nx).into_par_iter().for_each(|i| {
             let mut col: Vec3 = Vec3::from_value(0.0);
             for _ in 0..ns {
-                let u: f32 = ((i as f32)+rand::random::<f32>())/fx;
-                let v: f32 = (((ny-j) as f32)+rand::random::<f32>())/fy;
+                let u: f32 = ((i as f32) + rand::random::<f32>())/fx;
+                let v: f32 = (((ny-j) as f32) + rand::random::<f32>())/fy;
                 let r: Ray = cam.get_ray(u, v);
                 let _p: Vec3 = r.point_at_parameter(2.0);
                 col += color(r, &world, depth);
@@ -163,8 +183,8 @@ fn main() {
             let g: u8 = (255.99 * col.g()) as u8;
             let b: u8 = (255.99 * col.b()) as u8;
             let pixel = Rgb::from_channels(r, g, b, 0);
-            img.put_pixel(i, j, pixel);
-        }
-    }
-    let _ = img.save("assets/test.png");
+            safe_img.lock().unwrap().put_pixel(i, j, pixel);
+        });
+    });
+    let _ = safe_img.lock().unwrap().save("assets/test.png");
 }

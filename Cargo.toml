@@ -6,3 +6,4 @@ authors = ["jcmm <jcmmelton@gmail.com>"]
 [dependencies]
 image = "*"
 rand  = "*"
+rayon = "1.0"
