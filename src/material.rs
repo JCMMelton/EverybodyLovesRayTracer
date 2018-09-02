@@ -56,7 +56,7 @@ impl Material {
     }
 
     pub fn emit_diffuse_light(&self) -> Vec3 {
-        Vec3::from_value(1.0)
+        self.albedo
     }
 
     pub fn scatter(&self, r_in: &Ray, hit_record: &HitRecord, attenuation: &Vec3, scattered: &Ray) -> (bool, Ray, Vec3) {

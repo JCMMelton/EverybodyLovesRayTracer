@@ -117,7 +117,7 @@ fn main() {
                     Vec3::new(0.0, 1.0, -0.2),
                     0.2,
                      Material::new(
-                         Vec3::new(1.0, 1.0, 1.0),
+                         Vec3::new(0.2, 1.0, 0.2),
                          MaterialComposition::DiffuseLight,
                          0.5,
                          0.0
