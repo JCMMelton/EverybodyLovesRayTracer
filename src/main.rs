@@ -53,7 +53,7 @@ fn color(ray: Ray, world: &World, depth: i32) -> Vec3 {
 }
 
 fn main() {
-    let nx: u32 = 400;
+    let nx: u32 = 600;
     let ny: u32 = 400;
     let ns: u32 = 400;
     let fx: f32 = nx as f32;
@@ -114,10 +114,22 @@ fn main() {
             ),
             Box::new(
                 Sphere::new(
-                    Vec3::new(0.0, 1.0, -0.2),
-                    0.2,
+                    Vec3::new(1.3, 1.3, 0.2),
+                    0.3,
                      Material::new(
-                         Vec3::new(0.2, 1.0, 0.2),
+                         Vec3::new(1.0, 1.0, 1.0),
+                         MaterialComposition::DiffuseLight,
+                         0.5,
+                         0.0
+                     )
+                )
+            ),
+            Box::new(
+                Sphere::new(
+                    Vec3::new(-1.3, 1.3, 0.2),
+                    0.3,
+                     Material::new(
+                         Vec3::new(1.0, 1.0, 1.0),
                          MaterialComposition::DiffuseLight,
                          0.5,
                          0.0
