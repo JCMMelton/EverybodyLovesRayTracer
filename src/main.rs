@@ -36,17 +36,19 @@ fn color(ray: Ray, world: &World, depth: i32) -> Vec3 {
         let scattered: Ray = Ray::new_empty();
         let attenuation: Vec3 = Vec3::from_value(0.0);
         let scatter_result: (bool, Ray, Vec3) = (world_hit.1).mat.scatter(&ray, &world_hit.1, &attenuation, &scattered);
+        let emitted: Vec3 = (world_hit.1).mat.emitted();
         if depth < 50 && scatter_result.0 {
-            return scatter_result.2 * color(scatter_result.1, &world, depth+1);
+            return emitted + scatter_result.2 * color(scatter_result.1, &world, depth+1);
         }
         else {
-            return Vec3::from_value(0.0);
+            return emitted;
         }
     }
     else {
-        let unit_direction: Vec3 = Vec3::unit_vector(ray.direction());
-        let t: f32 = 0.5 * (unit_direction.y() + 1.0);
-        return (1.0-t)*Vec3::from_value(1.0) + t*Vec3::new(0.5, 0.7, 1.0);
+        // let unit_direction: Vec3 = Vec3::unit_vector(ray.direction());
+        // let t: f32 = 0.5 * (unit_direction.y() + 1.0);
+        // return (1.0-t)*Vec3::from_value(1.0) + t*Vec3::new(0.5, 0.7, 1.0);
+        return Vec3::from_value(0.0);
     }
 }
 
@@ -105,6 +107,18 @@ fn main() {
                      Material::new(
                          Vec3::new(0.2, 0.6, 0.9),
                          MaterialComposition::Lambertian,
+                         0.5,
+                         0.0
+                     )
+                )
+            ),
+            Box::new(
+                Sphere::new(
+                    Vec3::new(0.0, 1.0, -0.2),
+                    0.2,
+                     Material::new(
+                         Vec3::new(1.0, 1.0, 1.0),
+                         MaterialComposition::DiffuseLight,
                          0.5,
                          0.0
                      )

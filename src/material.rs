@@ -11,7 +11,8 @@ use utils::*;
 pub enum MaterialComposition {
     Lambertian,
     Metal,
-    Dialectric
+    Dialectric,
+    DiffuseLight
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -41,12 +42,36 @@ impl Material {
         }
     }
 
+    pub fn emitted(&self) -> Vec3 {
+        match self.composition {
+            MaterialComposition::Lambertian => self.emit_default(),
+            MaterialComposition::Metal => self.emit_default(),
+            MaterialComposition::Dialectric => self.emit_default(),
+            MaterialComposition::DiffuseLight => self.emit_diffuse_light()
+        }
+    }
+
+    pub fn emit_default(&self) -> Vec3 {
+        Vec3::from_value(0.0)
+    }
+
+    pub fn emit_diffuse_light(&self) -> Vec3 {
+        Vec3::from_value(1.0)
+    }
+
     pub fn scatter(&self, r_in: &Ray, hit_record: &HitRecord, attenuation: &Vec3, scattered: &Ray) -> (bool, Ray, Vec3) {
         match self.composition {
             MaterialComposition::Lambertian => self.scatter_lambertian(&r_in, &hit_record, &attenuation, &scattered),
             MaterialComposition::Metal => self.scatter_metal(&r_in, &hit_record, &attenuation, &scattered),
-            MaterialComposition::Dialectric => self.scatter_dialectric(&r_in, &hit_record, &attenuation, &scattered)
+            MaterialComposition::Dialectric => self.scatter_dialectric(&r_in, &hit_record, &attenuation, &scattered),
+            MaterialComposition::DiffuseLight => self.scatter_diffuse_light(&r_in, &hit_record, &attenuation, &scattered),
         }
+    }
+
+    pub fn scatter_diffuse_light(&self, r_in: &Ray, hit_record: &HitRecord, attenuation: &Vec3, scattered: &Ray) -> (bool, Ray, Vec3) {
+        let scatter: Ray = Ray::new(r_in.origin(), r_in.direction());
+        let atten: Vec3  = attenuation.copy();
+        (false, scatter, atten)
     }
 
     pub fn scatter_lambertian(&self, r_in: &Ray, hit_record: &HitRecord, attenuation: &Vec3, scattered: &Ray) -> (bool, Ray, Vec3) {
