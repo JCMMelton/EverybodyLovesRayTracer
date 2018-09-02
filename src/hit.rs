@@ -9,7 +9,9 @@ pub struct HitRecord {
     pub t: f32,
     pub p: Vec3,
     pub normal: Vec3,
-    pub mat: Material
+    pub mat: Material,
+    // pub u: f32,
+    // pub v: f32
 }
 
 impl HitRecord {

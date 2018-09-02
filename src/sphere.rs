@@ -28,25 +28,26 @@ impl Hit for Sphere {
         let b: f32 = Vec3::dot(&oc, &r.direction());
         let c: f32 = Vec3::dot(&oc, &oc) - self.radius*self.radius;
         let discriminant: f32 = f32::powf(b, 2.0) - (a*c);
-        let mut new_rec: HitRecord = HitRecord::new(Material::new_blank());
+        let mut new_rec: HitRecord = HitRecord::new(self.mat);
         if discriminant > 0.0 {
             let mut temp: f32 = (-b - f32::sqrt(f32::powf(b, 2.0) - a*c))/a;
             if temp < t_max && temp > t_min {
                 new_rec.t = temp;
-                new_rec.p = r.point_at_parameter(rec.t);
-                new_rec.normal = (rec.p - self.center) / self.radius;
+                new_rec.p = r.point_at_parameter(new_rec.t);
+                new_rec.normal = (new_rec.p - self.center) / self.radius;
                 new_rec.mat = self.mat;
                 return (true, new_rec);
             }
             temp = (-b + f32::sqrt(f32::powf(b, 2.0) - a*c))/a;
             if temp < t_max && temp > t_min {
                 new_rec.t = temp;
-                new_rec.p = r.point_at_parameter(rec.t);
-                new_rec.normal = (rec.p - self.center) / self.radius;
+                new_rec.p = r.point_at_parameter(new_rec.t);
+                new_rec.normal = (new_rec.p - self.center) / self.radius;
                 new_rec.mat = self.mat;
                 return (true, new_rec);
             }
         }
+        new_rec.copy_from_hit_record(&rec);
         (false, new_rec)
     }
     fn bounding_box(&self, t0: f32, t1: f32) -> AABB {

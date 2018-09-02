@@ -23,6 +23,7 @@ mod material;
 use material::*;
 mod utils;
 mod bounding_box;
+use bounding_box::*;
 mod rectangle;
 use rectangle::*;
 
@@ -30,7 +31,7 @@ fn color(ray: Ray, world: &World, depth: i32) -> Vec3 {
     let hit_record: HitRecord = HitRecord::new(
         Material::new_blank()
     );
-    let world_hit = world.hit(&ray, 0.0001, f32::MAX, &hit_record);
+    let world_hit: (bool, HitRecord) = world.hit(&ray, 0.0001, f32::MAX, &hit_record);
     if world_hit.0 {
         let scattered: Ray = Ray::new_empty();
         let attenuation: Vec3 = Vec3::from_value(0.0);
@@ -49,37 +50,18 @@ fn color(ray: Ray, world: &World, depth: i32) -> Vec3 {
     }
 }
 
-fn sphere_swoop(n: u32) -> Vec<Sphere> {
-    let mut spheres: Vec<Sphere> = Vec::new();
-    for s in 0..n {
-        let sf: f32 = s as f32;
-        spheres.push(
-            Sphere::new(
-                Vec3::new(0.0+f32::sin(sf), 0.0+f32::cos(sf), -1.0-(sf*0.5)), 0.5+(sf*0.1),
-                Material::new(
-                    Vec3::new(0.9, 0.9, 0.9),
-                    MaterialComposition::Metal,
-                    0.1,
-                    0.0
-                )
-            )
-        );
-    }
-    spheres
-}
-
 fn main() {
     let nx: u32 = 400;
-    let ny: u32 = nx/2;
-    let ns: u32 = nx/2;
+    let ny: u32 = 400;
+    let ns: u32 = 400;
     let fx: f32 = nx as f32;
     let fy: f32 = ny as f32;
-    let mut img = ImageBuffer::new(nx, ny);
+    let img = ImageBuffer::new(nx, ny);
 
-    let lookfrom: Vec3 = Vec3::new(-1.0, 1.0, 1.0);
-    let lookat:   Vec3 = Vec3::new(0.0, 0.0, -1.0);
+    let lookfrom: Vec3 = Vec3::new( 0.0, 0.0,  1.0);
+    let lookat:   Vec3 = Vec3::new( 0.0, 0.0, -1.0);
     let dist_to_focus: f32 = (lookfrom-lookat).length();
-    let aperture: f32 = 1.2;
+    let aperture: f32 = 0.1;
 
     let cam: Camera = Camera::new(
         lookfrom,
@@ -92,76 +74,41 @@ fn main() {
     );
     let world: World = World::from_vec(
         vec![
-            // Box::new(
-            //     Sphere::new(
-            //         Vec3::new(0.0, 0.0, -1.0), 0.5,
-            //         Material::new(
-            //             Vec3::new(0.9, 0.9, 0.9),
-            //             MaterialComposition::Dialectric,
-            //             0.2,
-            //             0.9
-            //         )
-            //     )
-            // ),
             Box::new(
                 Sphere::new(
                     Vec3::new(0.0, -100.5, -1.0),
                     100.0,
                      Material::new(
-                         Vec3::new(0.8, 0.8, 0.3),
+                         Vec3::new(0.9, 0.2, 0.2),
                          MaterialComposition::Lambertian,
                          0.0,
                          0.0
                      )
                 )
             ),
-            // Box::new(
-            //     Sphere::new(
-            //         Vec3::new(1.4, 0.2, -1.2),
-            //         0.5,
-            //          Material::new(
-            //              Vec3::new(0.9, 0.9, 0.9),
-            //              MaterialComposition::Metal,
-            //              0.0,
-            //              0.0
-            //          )
-            //     )
-            // ),
-            // Box::new(
-            //     Sphere::new(
-            //         Vec3::new(-2.0, 3.0, -3.0),
-            //         1.75,
-            //         Material::new(
-            //             Vec3::new(0.8, 0.8, 0.8),
-            //             MaterialComposition::Metal,
-            //             0.0,
-            //             0.0
-            //         )
-            //     )
-            // ),
-            // Box::new(
-            //     Sphere::new(
-            //         Vec3::new(0.0, 2.0, 3.0),
-            //         1.75,
-            //         Material::new(
-            //          Vec3::new(0.8, 0.8, 0.8),
-            //          MaterialComposition::Lambertian,
-            //          0.0,
-            //          0.0
-            //         )
-            //     )
-            // ),
             Box::new(
-                Rectangle::new(
-                    [0.0, 10.0, -10.0, 0.0],
-                    -1.0,
+                Sphere::new(
+                    Vec3::new(-1.0, 0.3, -1.0), 
+                    0.5,
                     Material::new(
-                        Vec3::new(0.8, 0.8, 0.8),
-                        MaterialComposition::Lambertian,
-                        0.0,
+                        Vec3::new(0.9, 0.9, 0.9),
+                        MaterialComposition::Metal,
+                        0.01,
                         0.0
                     )
-                )    
+                )
+            ),
+            Box::new(
+                Sphere::new(
+                    Vec3::new(1.0, 0.2, -0.6),
+                    0.5,
+                     Material::new(
+                         Vec3::new(0.2, 0.6, 0.9),
+                         MaterialComposition::Lambertian,
+                         0.5,
+                         0.0
+                     )
+                )
             )
         ]
     );
@@ -171,9 +118,9 @@ fn main() {
         (0..nx).into_par_iter().for_each(|i| {
             let mut col: Vec3 = Vec3::from_value(0.0);
             for _ in 0..ns {
-                let u: f32 = ((i as f32) + rand::random::<f32>())/fx;
-                let v: f32 = (((ny-j) as f32) + rand::random::<f32>())/fy;
-                let r: Ray = cam.get_ray(u, v);
+                let u:  f32  = ((i as f32) + rand::random::<f32>())/fx;
+                let v:  f32  = (((ny-j) as f32) + rand::random::<f32>())/fy;
+                let r:  Ray  = cam.get_ray(u, v);
                 let _p: Vec3 = r.point_at_parameter(2.0);
                 col += color(r, &world, depth);
             }
