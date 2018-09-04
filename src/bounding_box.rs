@@ -1,6 +1,7 @@
 
 use vec3::*;
 use ray::*;
+use hit::*;
 
 #[derive(Debug, Copy, Clone)]
 pub struct AABB {
@@ -21,7 +22,7 @@ impl AABB {
     pub fn max(&self) -> Vec3 {
         self.max
     }
-    pub fn hit(&self, r: &Ray, tmin: f32, tmax: f32) -> bool {
+    pub fn hit1(&self, r: &Ray, tmin: f32, tmax: f32) -> bool {
         for a in 0..3 {
             let t0: f32 = f32::min(
                 (self.min[a] - r.origin()[a]) / r.direction()[a],
@@ -70,5 +71,30 @@ impl AABB {
             min: small, 
             max: big
         }
+    }
+}
+
+impl Hit for AABB {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32, rec: &HitRecord) -> (bool, HitRecord) {
+        for a in 0..3 {
+            let t0: f32 = f32::min(
+                (self.min[a] - r.origin()[a]) / r.direction()[a],
+                 self.max[a] - r.origin()[a] / r.direction()[a]);
+            let t1: f32 = f32::max(
+                (self.min[a] - r.origin()[a]) / r.direction()[a],
+                 self.max[a] - r.origin()[a] / r.direction()[a]);
+            let tmin_l = f32::max(t0, t_min);
+            let tmax_l = f32::min(t1, t_max);
+            if tmax_l <= tmin_l {
+                return (false, HitRecord::from_hit_record(rec) );
+            }
+        }
+        (true, HitRecord::from_hit_record(rec) )
+    }
+    fn bounding_box(&self, t0: f32, t1: f32) -> AABB {
+        AABB::new(&self.min, &self.max)
+    }
+    fn get_z_order(&self) -> u32 {
+        0u32
     }
 }

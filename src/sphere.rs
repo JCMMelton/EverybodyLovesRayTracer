@@ -4,6 +4,7 @@ use hit::*;
 use ray::*;
 use material::*;
 use bounding_box::*;
+use utils::*;
 
 pub struct Sphere {
     pub radius: f32,
@@ -52,5 +53,16 @@ impl Hit for Sphere {
     }
     fn bounding_box(&self, t0: f32, t1: f32) -> AABB {
         AABB::new(&(self.center.copy() - Vec3::from_value(self.radius)), &(self.center.copy() - Vec3::from_value(self.radius)))  
+    }
+    fn get_z_order(&self) -> u32 {
+        let mut x: u32 = (self.center.x()*10.0) as u32;
+        let mut y: u32 = (self.center.y()*10.0) as u32;
+        let mut z: u32 = (self.center.z()*10.0) as u32;
+
+        x = Utils::tozee(x);
+        y = Utils::tozee(y);
+        z = Utils::tozee(z);
+
+        x | (y << 1) | (z << 2)
     }
 }

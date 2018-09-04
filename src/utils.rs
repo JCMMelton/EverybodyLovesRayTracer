@@ -7,6 +7,15 @@ pub struct Utils {}
 
 impl Utils {
 
+    pub fn tozee(n: u32) -> u32 {
+        let mut m: u32;
+        m = (n | (n << 8)) & 0x00FF00FF;
+        m = (m | (m << 4)) & 0x0F0F0F0F;
+        m = (m | (m << 2)) & 0x33333333;
+        m = (m | (m << 1)) & 0x55555555;
+        m
+    }
+
     pub fn random_in_unit_disk() -> Vec3 {
         let mut p: Vec3;
         loop {

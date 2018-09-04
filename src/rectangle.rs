@@ -4,6 +4,7 @@ use material::*;
 use ray::*;
 use hit::*;
 use bounding_box::*;
+use utils::*;
 
 pub struct Rectangle {
     coords: [f32; 4],
@@ -55,5 +56,16 @@ impl Hit for Rectangle {
     }
     fn bounding_box(&self, t0: f32, t1: f32) -> AABB {
         AABB::new(&Vec3::from_value(0.0), &Vec3::from_value(0.0))
+    }
+    fn get_z_order(&self) -> u32 {
+        let mut x: u32 = (((self.x0()-self.x1())/2.0)*10.0) as u32;
+        let mut y: u32 = (((self.y0()-self.y1())/2.0)*10.0) as u32;
+        let mut z: u32 = (self.k*10.0) as u32;
+
+        x = Utils::tozee(x);
+        y = Utils::tozee(y);
+        z = Utils::tozee(z);
+
+        x | (y << 1) | (z << 2)
     }
 }
