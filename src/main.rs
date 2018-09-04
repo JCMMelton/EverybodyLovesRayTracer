@@ -51,8 +51,8 @@ fn color(ray: Ray, world: &World, depth: i32) -> Vec3 {
 }
 
 fn main() {
-    let nx: u32 = 200;
-    let ny: u32 = 200;
+    let nx: u32 = 400;
+    let ny: u32 = 300;
     let ns: u32 = 400;
     let fx: f32 = nx as f32;
     let fy: f32 = ny as f32;
@@ -61,7 +61,7 @@ fn main() {
     let lookfrom: Vec3 = Vec3::new( 0.0, 0.0,  1.0);
     let lookat:   Vec3 = Vec3::new( 0.0, 0.0, -1.0);
     let dist_to_focus: f32 = (lookfrom-lookat).length();
-    let aperture: f32 = 0.1;
+    let aperture: f32 = 0.3;
 
     let cam: Camera = Camera::new(
         lookfrom,
@@ -73,82 +73,6 @@ fn main() {
         dist_to_focus
     );
     let world: World = World::sphere_wall();
-    // let world: World = World::from_vec(
-    //     vec![
-    //         // Box::new(
-    //         //     Sphere::new(
-    //         //         Vec3::new(0.0, -100.5, -1.0),
-    //         //         100.0,
-    //         //         Material::new(
-    //         //             Vec3::new(0.9, 0.2, 0.2),
-    //         //             MaterialComposition::Lambertian,
-    //         //             0.0,
-    //         //             0.0
-    //         //         )
-    //         //     )
-    //         // ),
-    //         Box::new(
-    //             Sphere::new(
-    //                 Vec3::new(-1.0, 0.3, -1.0), 
-    //                 0.5,
-    //                 Material::new(
-    //                     Vec3::new(0.9, 0.9, 0.9),
-    //                     MaterialComposition::Metal,
-    //                     0.01,
-    //                     0.0
-    //                 )
-    //             )
-    //         ),
-    //         Box::new(
-    //             Sphere::new(
-    //                 Vec3::new(1.0, 0.2, -0.6),
-    //                 0.5,
-    //                 Material::new(
-    //                     Vec3::new(0.2, 0.6, 0.9),
-    //                     MaterialComposition::Metal,
-    //                     0.01,
-    //                     0.0
-    //                 )
-    //             )
-    //         ),
-    //         Box::new(
-    //             Sphere::new(
-    //                 Vec3::new(0.0, 2.9, -2.9),
-    //                 1.7,
-    //                 Material::new(
-    //                     Vec3::new(0.2, 0.6, 0.9),
-    //                     MaterialComposition::Lambertian,
-    //                     0.5,
-    //                     0.5
-    //                 )
-    //             )
-    //         ),
-    //         Box::new(
-    //             Sphere::new(
-    //                 Vec3::new(-1.3, 1.7, 0.2),
-    //                 0.5,
-    //                 Material::new(
-    //                     Vec3::new(1.0, 1.0, 1.0),
-    //                     MaterialComposition::DiffuseLight,
-    //                     0.5,
-    //                     0.0
-    //                 )
-    //             )
-    //         ),
-    //         Box::new(
-    //             Sphere::new(
-    //                 Vec3::new(1.7, 0.5, -2.2),
-    //                 0.3,
-    //                 Material::new(
-    //                     Vec3::new(1.0, 1.0, 1.0),
-    //                     MaterialComposition::DiffuseLight,
-    //                     0.5,
-    //                     0.0
-    //                 )
-    //             )
-    //         )
-    //     ]
-    // );
     world.get_z_orders();
     println!("{:?}", world.bounding_box(0.0, 1.0));
     let depth: i32 = 0;

@@ -29,12 +29,12 @@ impl World {
     }
     pub fn get_z_orders(&self) {
         let leaves: usize = self.contents.len();
-        let nodes:  usize = leaves-1;
+        let nodes: usize = leaves - 1;
         // let mut top_node: BvhNode
         //let nodes: Vec<Box<BvhNode>> = Vec::new();
         for object in self.contents.iter() {
             println!("{:?}", object.get_z_order());
-            println!("{:?}", format!("{:b}", object.get_z_order()) );
+            println!("{:?}", format!("{:b}", object.get_z_order()));
             // self.tree.entry(object.get_z_order()).or_insert(object);
             //nodes.push( Box::new(BvhNode::new(&object, object.get_z_order())) );
         }
@@ -44,14 +44,15 @@ impl World {
         let mut contents: Vec<Box<Hit>> = Vec::new();
         let xm: usize = 10;
         let ym: usize = 10;
+        let mut z: f32 = -2.0;
         for x in 0..xm {
-            let xf: f32 = (x as f32)-((xm/2) as f32);
+            let xf: f32 = (x as f32) - ((xm / 2) as f32);
             for y in 0..ym {
-                let yf: f32 = (y as f32)-((ym/2) as f32);
-                contents.push(            
+                let yf: f32 = (y as f32) - ((ym / 2) as f32);
+                contents.push(
                     Box::new(
                         Sphere::new(
-                            Vec3::new(xf, yf, -2.0), 
+                            Vec3::new(xf, yf, z-yf),
                             0.5,
                             Material::new(
                                 Vec3::new(0.9, 0.4, 0.2),
@@ -64,10 +65,24 @@ impl World {
                 );
             }
         }
-        contents.push( 
-            Box::new(           
+        contents.push(
+            Box::new(
                 Sphere::new(
-                    Vec3::new(0.0, 0.5, 2.5),
+                    Vec3::new(0.0, 2.5, 0.5),
+                    1.0,
+                    Material::new(
+                        Vec3::new(1.0, 1.0, 1.0),
+                        MaterialComposition::DiffuseLight,
+                        0.5,
+                        0.0
+                    )
+                )
+            )
+        );
+        contents.push(
+            Box::new(
+                Sphere::new(
+                    Vec3::new(0.0, -2.5, 0.5),
                     1.0,
                     Material::new(
                         Vec3::new(1.0, 1.0, 1.0),
@@ -80,6 +95,86 @@ impl World {
         );
         World {
             contents
+        }
+    }
+
+    pub fn test_scene() -> Self {
+        World {
+            contents:
+            vec![
+                Box::new(
+                    Sphere::new(
+                        Vec3::new(0.0, -100.5, -1.0),
+                        100.0,
+                        Material::new(
+                            Vec3::new(0.9, 0.2, 0.2),
+                            MaterialComposition::Lambertian,
+                            0.0,
+                            0.0
+                        )
+                    )
+                ),
+                Box::new(
+                    Sphere::new(
+                        Vec3::new(-1.0, 0.3, -1.0),
+                        0.5,
+                        Material::new(
+                            Vec3::new(0.9, 0.9, 0.9),
+                            MaterialComposition::Metal,
+                            0.01,
+                            0.0
+                        )
+                    )
+                ),
+                Box::new(
+                    Sphere::new(
+                        Vec3::new(1.0, 0.2, -0.6),
+                        0.5,
+                        Material::new(
+                            Vec3::new(0.2, 0.6, 0.9),
+                            MaterialComposition::Metal,
+                            0.01,
+                            0.0
+                        )
+                    )
+                ),
+                Box::new(
+                    Sphere::new(
+                        Vec3::new(0.0, 2.9, -2.9),
+                        1.7,
+                        Material::new(
+                            Vec3::new(0.2, 0.6, 0.9),
+                            MaterialComposition::Lambertian,
+                            0.5,
+                            0.5
+                        )
+                    )
+                ),
+                Box::new(
+                    Sphere::new(
+                        Vec3::new(-1.3, 1.7, 0.2),
+                        0.5,
+                        Material::new(
+                            Vec3::new(1.0, 1.0, 1.0),
+                            MaterialComposition::DiffuseLight,
+                            0.5,
+                            0.0
+                        )
+                    )
+                ),
+                Box::new(
+                    Sphere::new(
+                        Vec3::new(1.7, 0.5, -2.2),
+                        0.3,
+                        Material::new(
+                            Vec3::new(1.0, 1.0, 1.0),
+                            MaterialComposition::DiffuseLight,
+                            0.5,
+                            0.0
+                        )
+                    )
+                )
+            ]
         }
     }
 }
