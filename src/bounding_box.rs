@@ -97,4 +97,7 @@ impl Hit for AABB {
     fn get_z_order(&self) -> u32 {
         0u32
     }
+    fn describe(&self) {
+        println!("AABB at {:?}{:?}", self.min(), self.max());
+    }
 }

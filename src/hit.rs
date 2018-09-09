@@ -43,4 +43,5 @@ pub trait Hit {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32, rec: &HitRecord) -> (bool, HitRecord);
     fn bounding_box(&self, t0: f32, t1: f32) -> AABB;
     fn get_z_order(&self) -> u32;
+    fn describe(&self);
 }

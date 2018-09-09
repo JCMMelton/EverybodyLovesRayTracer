@@ -16,14 +16,26 @@ impl Utils {
         m
     }
 
+    pub fn zeeify(x: u32, y: u32, z: u32) -> u32 {
+        let mut f: u32 = 0;
+        for i in 0..4 {
+            f |= (x & 1u32 << i) << (i*2) | (y & 1u32 << i) << ((i*2) + 1) | (z & 1u32 << i) << ((i*2) + 2);
+        }
+        f
+    }
+
+    pub fn prinb(n: u32) {
+        println!("{:?}", format!("{:b}", n));
+    }
+
     pub fn random_in_unit_disk() -> Vec3 {
         let mut p: Vec3;
         loop {
-                p = 2.0*Vec3::new(
-                    rand::random::<f32>(),
-                    rand::random::<f32>(),
-                    0.0
-                ) - Vec3::new(1.0, 1.0, 0.0);
+            p = 2.0*Vec3::new(
+                rand::random::<f32>(),
+                rand::random::<f32>(),
+                0.0
+            ) - Vec3::new(1.0, 1.0, 0.0);
             if Vec3::dot(&p, &p) >= 1.0 {
                 break;
             } 

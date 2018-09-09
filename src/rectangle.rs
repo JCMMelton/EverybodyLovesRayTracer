@@ -62,10 +62,9 @@ impl Hit for Rectangle {
         let mut y: u32 = (((self.y0()-self.y1())/2.0)*10.0) as u32;
         let mut z: u32 = (self.k*10.0) as u32;
 
-        x = Utils::tozee(x);
-        y = Utils::tozee(y);
-        z = Utils::tozee(z);
-
-        x | (y << 1) | (z << 2)
+        Utils::zeeify(x, y, z)
+    }
+    fn describe(&self) {
+        println!("Rect at {:?}{:?}{:?}{:?}", self.x0(), self.x1(), self.y0(), self.y1());
     }
 }

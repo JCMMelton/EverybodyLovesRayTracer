@@ -51,8 +51,8 @@ fn color(ray: Ray, world: &World, depth: i32) -> Vec3 {
 }
 
 fn main() {
-    let nx: u32 = 400;
-    let ny: u32 = 300;
+    let nx: u32 = 1600;
+    let ny: u32 = 1200;
     let ns: u32 = 400;
     let fx: f32 = nx as f32;
     let fy: f32 = ny as f32;
@@ -61,7 +61,7 @@ fn main() {
     let lookfrom: Vec3 = Vec3::new( 0.0, 0.0,  1.0);
     let lookat:   Vec3 = Vec3::new( 0.0, 0.0, -1.0);
     let dist_to_focus: f32 = (lookfrom-lookat).length();
-    let aperture: f32 = 0.3;
+    let aperture: f32 = 0.1;
 
     let cam: Camera = Camera::new(
         lookfrom,
@@ -72,7 +72,8 @@ fn main() {
         aperture,
         dist_to_focus
     );
-    let world: World = World::sphere_wall();
+    let world: World = World::single_sphere();
+//    let world: World = World::test_scene();
     world.get_z_orders();
     println!("{:?}", world.bounding_box(0.0, 1.0));
     let depth: i32 = 0;
